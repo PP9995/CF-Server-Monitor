@@ -1042,12 +1042,12 @@ export async function handleAdminUI(request, env, sys) {
               
               <div class="form-group">
                 <label class="form-label">Telegram Token / WeChat Webhook</label>
-                <input type="text" id="cfg_tg_bot_token" class="form-input" value="${sys.tg_bot_token || ''}" placeholder="Bot Token or Webhook URL">
+                <input type="password" id="cfg_tg_bot_token" class="form-input" value="${sys.tg_bot_token || ''}" placeholder="Bot Token or Webhook URL">
               </div>
               
               <div class="form-group">
                 <label class="form-label">Chat ID</label>
-                <input type="text" id="cfg_tg_chat_id" class="form-input" value="${sys.tg_chat_id || ''}" placeholder="Telegram Chat ID (optional for WeChat)">
+                <input type="password" id="cfg_tg_chat_id" class="form-input" value="${sys.tg_chat_id || ''}" placeholder="Telegram Chat ID (optional for WeChat)">
               </div>
             </div>
           </div>

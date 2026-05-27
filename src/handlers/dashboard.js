@@ -207,18 +207,15 @@ export async function handleDashboard(request, env, sys) {
         if (sys.show_price === 'true' && server.price) {
           metaHtml += `<div class="card-meta">💰 ${server.price}</div>`;
         }
-        if (sys.show_expire === 'true') {
-          let expireText = '永久';
-          if (server.expire_date) {
-            const expTime = new Date(server.expire_date).getTime();
-            if (!isNaN(expTime)) {
-              const diff = expTime - now;
-              expireText = diff > 0 
-                ? Math.ceil(diff / (1000 * 3600 * 24)) + 'd' 
-                : '<span style="color:var(--accent-red);">EXPIRED</span>';
-            }
+        if (sys.show_expire === 'true' && server.expire_date) {
+          const expTime = new Date(server.expire_date).getTime();
+          if (!isNaN(expTime)) {
+            const diff = expTime - now;
+            const expireText = diff > 0 
+              ? Math.ceil(diff / (1000 * 3600 * 24)) + 'd' 
+              : '<span style="color:var(--accent-red);">EXPIRED</span>';
+            metaHtml += `<div class="card-meta">📅 ${expireText}</div>`;
           }
-          metaHtml += `<div class="card-meta">📅 ${expireText}</div>`;
         }
 
         // 徽章
@@ -1102,18 +1099,15 @@ export async function handleDashboard(request, env, sys) {
           if (sysConfig.show_price && server.price) {
             metaHtml += '<div class="card-meta">💰 ' + server.price + '</div>';
           }
-          if (sysConfig.show_expire) {
-            let expireText = '永久';
-            if (server.expire_date) {
-              const expTime = new Date(server.expire_date).getTime();
-              if (!isNaN(expTime)) {
-                const diff = expTime - now;
-                expireText = diff > 0 
-                  ? Math.ceil(diff / (1000 * 3600 * 24)) + 'd' 
-                  : '<span style="color:var(--accent-red);">EXPIRED</span>';
-              }
+          if (sysConfig.show_expire && server.expire_date) {
+            const expTime = new Date(server.expire_date).getTime();
+            if (!isNaN(expTime)) {
+              const diff = expTime - now;
+              const expireText = diff > 0 
+                ? Math.ceil(diff / (1000 * 3600 * 24)) + 'd' 
+                : '<span style="color:var(--accent-red);">EXPIRED</span>';
+              metaHtml += '<div class="card-meta">📅 ' + expireText + '</div>';
             }
-            metaHtml += '<div class="card-meta">📅 ' + expireText + '</div>';
           }
           
           let badgesHtml = '';
