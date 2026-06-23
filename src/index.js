@@ -158,7 +158,6 @@ export default {
 
     const bypassTurnstilePaths = [
       '/admin/api',
-      '/api/config',
     ];
 
     const isApiRequest = path.startsWith('/api/') || path.startsWith('/admin/api');
@@ -166,10 +165,18 @@ export default {
       await initDatabase(env.DB);
     }
 
+    // /api/config 在不带 X-Turnstile-Token 时仍然 bypass（用于初始化判断是否需要验证），
+    // 带 token 时则走完整验证流程，以便复用 cookie_auth 字段返回验证结果
+    const isTurnstileBypassed = (reqPath) => {
+      if (bypassTurnstilePaths.includes(reqPath)) return true;
+      if (reqPath === '/api/config' && !request.headers.get('X-Turnstile-Token')) return true;
+      return false;
+    };
+
     let setTurnstileCookie = false;
     let sys = null;
-    
-    if (isApiRequest && !bypassTurnstilePaths.includes(path)) {
+
+    if (isApiRequest && !isTurnstileBypassed(path)) {
       sys = await loadSiteSettings(env.DB);
       const turnstileEnabled = sys.turnstile_enabled === 'true';
       const turnstileSecretKey = sys.turnstile_secret_key || '';
@@ -214,11 +221,15 @@ export default {
         await ensureFullSettings();
         const turnstileEnabled = sys.turnstile_enabled === 'true';
         let cookieAuth = false;
-        
+
         if (turnstileEnabled) {
           cookieAuth = await isTurnstileCookieValid(request, env);
+          // 本次请求刚完成 token 校验，cookie 会在响应里下放，这里需要把 cookie_auth 标记为 true
+          if (setTurnstileCookie) {
+            cookieAuth = true;
+          }
         }
-        
+
         return createSuccessResponse({
           turnstile_enabled: turnstileEnabled,
           turnstile_site_key: sys.turnstile_site_key || '',
